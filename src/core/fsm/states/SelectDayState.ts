@@ -1,0 +1,93 @@
+import { ASK_DAY_AGAIN_MESSAGE, ASK_DAY_MESSAGE, ASK_TIME_MESSAGE, ASK_TURN_AGAIN_MESSAGE, ASK_TURN_MESSAGE, BACK_TO_DAY_MESSAGE, BUTTON_DAYS_MESSAGE, BUTTON_TURN_MESSAGE, DESCRIPTION_DAYS_MESSAGE, DESCRIPTION_TURN_MESSAGE, TITLE_DAYS_MESSAGE, TITLE_TURN_MESSAGE } from '../../../constants/messages.js';
+import { AppointmentEngine } from '../../../domains/appointments/AppointmentEngine.js';
+import { ConversationContext, DomainResponse } from '../../../interfaces/index.js';
+import { State } from '../State.js';
+import { TenantService } from '../../../services/TenantService.js';
+
+export class SelectDayState implements State {
+    async handle(ctx: ConversationContext): Promise<DomainResponse> {
+        const text = ctx.message.message.toLowerCase();
+        const config = await TenantService.getBusinessConfig(ctx.businessId);
+        const turns = await AppointmentEngine.getAvailableTurns(ctx.businessId, config, ctx.session.memory.serviceId, ctx.session.memory.date);
+        const selectedService = ctx.session.memory.serviceId;
+        const availableDays = await AppointmentEngine.getAvailableDays(ctx.businessId, config, selectedService);
+
+        if (!turns.length) {
+            return {
+                newState: 'SELECT_DAY',
+                responseMessages: [
+                    {
+                        type: 'list',
+                        content: ASK_DAY_AGAIN_MESSAGE,
+                        title: TITLE_DAYS_MESSAGE,
+                        buttonText: BUTTON_DAYS_MESSAGE,
+                        rows: availableDays.slice(0, 10).map(day => ({
+                            title: day,
+                            description: DESCRIPTION_DAYS_MESSAGE
+                        }))
+                    }
+                ]
+            };
+        }
+
+        if (text.includes(BACK_TO_DAY_MESSAGE)) {
+            return {
+                newState: 'SELECT_DAY',
+                responseMessages: [
+                    {
+                        type: 'list',
+                        content: ASK_DAY_AGAIN_MESSAGE,
+                        title: TITLE_DAYS_MESSAGE,
+                        buttonText: BUTTON_DAYS_MESSAGE,
+                        rows: availableDays.slice(0, 10).map(day => ({
+                            title: day,
+                            description: DESCRIPTION_DAYS_MESSAGE
+                        }))
+                    }
+                ]
+            };
+        };
+
+        if (turns.length === 1) {
+            let availableSlots = await AppointmentEngine.getAvailableSlots(ctx.businessId, config, selectedService, text);
+            return {
+                newState: 'SELECT_TIME',
+                responseMessages: [
+                    {
+                        type: 'list',
+                        content: ASK_TIME_MESSAGE,
+                        title: TITLE_DAYS_MESSAGE,
+                        buttonText: BUTTON_DAYS_MESSAGE,
+                        rows: availableSlots.slice(0, 10).map(slot => ({
+                            title: slot,
+                            description: DESCRIPTION_DAYS_MESSAGE
+                        }))
+                    }
+                ],
+                memoryUpdate: {
+                    date: text
+                }
+            };
+        };
+
+
+        return {
+            newState: 'SELECT_TURN',
+            responseMessages: [
+                {
+                    type: 'list',
+                    content: ASK_TURN_MESSAGE,
+                    title: TITLE_TURN_MESSAGE,
+                    buttonText: BUTTON_TURN_MESSAGE,
+                    rows: turns.slice(0, 10).map(turn => ({
+                        title: turn,
+                        description: DESCRIPTION_TURN_MESSAGE
+                    }))
+                }
+            ],
+            memoryUpdate: {
+                date: text
+            }
+        };
+    }
+}

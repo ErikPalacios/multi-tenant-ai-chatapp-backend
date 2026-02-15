@@ -12,3 +12,6 @@ app.listen(PORT, () => {
     console.log(` Mode: Production-ready         `);
     console.log(`====================================`);
 });
+// File description:
+// This file is the entry point of the application.
+// It is responsible for starting the server and listening for incoming requests.
