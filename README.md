@@ -1,68 +1,68 @@
 # Heronova AI - Multi-Tenant Backend 🚀
 
 > [!WARNING]
-> 🚧 **PROYECTO EN PROGRESO (Work in Progress)** 🚧
-> El sistema está actualmente en fase de desarrollo activo.
+> 🚧 **Work in Progress (WIP)** 🚧
+> This project is currently under active development.
 
-Heronova es una plataforma backend potente y escalable diseñada para gestionar chatbots de inteligencia artificial multi-inquilino (multi-tenant) con integración a **WhatsApp**. Está optimizada para la automatización de citas, gestión de servicios y atención al cliente automatizada.
+Heronova is a powerful and scalable backend platform designed to manage multi-tenant AI chatbots with **WhatsApp** integration. It is optimized for appointment automation, service management, and automated customer support.
 
-## ✨ Características Principales
+## ✨ Key Features
 
-- **Arquitectura Multi-Tenant**: Aislamiento completo de datos por negocio.
-- **Sistema de Autenticación JWT**: Registro de dueños, gestión de empleados y roles protegidos.
-- **Motor de Citas Avanzado**: Cálculo dinámico de disponibilidad basado en días, turnos (Matutino/Vespertino/Nocturno) y horarios.
-- **Máquina de Estados Propietiva (FSM)**: Flujos conversacionales robustos y persistentes.
-- **Integraciones de Mensajería**: Soporte para la API Oficial de WhatsApp (Meta) y WATI.
-- **Persistencia en Tiempo Real**: Integración profunda con Firebase Firestore.
-- **Protección de Concurrencia**: Sistema de bloqueos (locks) para evitar duplicidad de citas.
+- **Multi-Tenant Architecture**: Complete data isolation per business.
+- **JWT Authentication System**: Owner registration, employee management, and protected roles.
+- **Advanced Appointment Engine**: Dynamic availability calculation based on days, shifts (Morning/Afternoon/Night), and time slots.
+- **Proprietary Finite State Machine (FSM)**: Robust and persistent conversational flows.
+- **Messaging Integrations**: Support for WhatsApp Official API (Meta) and WATI.
+- **Real-Time Persistence**: Deep integration with Firebase Firestore.
+- **Concurrency Protection**: Slot locking system to prevent double bookings.
 
-## 🛠️ Stack Tecnológico
+## 🛠️ Tech Stack
 
-- **Lenguaje:** TypeScript / Node.js
-- **FrameWork:** Express
-- **Base de Datos:** Firebase Firestore (Admin SDK)
-- **Seguridad:** JWT (jsonwebtoken) & Hashing (bcrypt)
+- **Language:** TypeScript / Node.js
+- **Framework:** Express
+- **Database:** Firebase Firestore (Admin SDK)
+- **Security:** JWT (jsonwebtoken) & Hashing (bcrypt)
 - **Testing:** Vitest
 
-## 🚀 Instalación y Uso
+## 🚀 Installation and Usage
 
-### 1. Clonar el repositorio
+### 1. Clone the repository
 ```bash
 git clone https://github.com/Erik7u7-n8n/multi-tenant-ai-chatapp-backend.git
 cd multi-tenant-ai-chatapp-backend
 ```
 
-### 2. Instalar dependencias
+### 2. Install dependencies
 ```bash
 npm install
 ```
 
-### 3. Configurar variables de entorno
-Crea un archivo `.env` basado en `.env.example`:
+### 3. Configure environment variables
+Create a `.env` file based on `.env.example`:
 ```bash
 cp .env.example .env
 ```
-Asegúrate de configurar tus credenciales de Firebase y el `JWT_SECRET`.
+Ensure you configure your Firebase credentials and `JWT_SECRET`.
 
-### 4. Ejecutar Pruebas
+### 4. Run Tests
 ```bash
 npm run test
 ```
 
-## 📂 Estructura del Proyecto
+## 📂 Project Structure
 
-- `src/api`: Controladores y Middlewares (Entrada del sistema).
-- `src/core`: Lógica central (Orquestador, FSM, Guards).
-- `src/domains`: Servicios de dominio (Citas, Usuarios, Negocios).
-- `src/integrations`: Conexiones externas (Firebase, WhatsApp).
-- `src/interfaces`: Definiciones de tipos y contratos.
+- `src/api`: Controllers and Middlewares (System entry point).
+- `src/core`: Core logic (Orchestrator, FSM, Guards).
+- `src/domains`: Domain services (Appointments, Users, Businesses).
+- `src/integrations`: External connections (Firebase, WhatsApp).
+- `src/interfaces`: Type definitions and contracts.
 
-## 📝 Próximos Pasos (To-Do)
+## 📝 Roadmap (To-Do)
 
-- [ ] Implementación de Dashboard Web para dueños.
-- [ ] Integración con modelos de IA avanzados (Langchain/OpenAI).
-- [ ] Sistema de recordatorios automáticos por WhatsApp.
-- [ ] Generación de reportes y analíticas de citas.
+- [ ] Web Dashboard for business owners.
+- [ ] Integration with advanced AI models (Langchain/OpenAI).
+- [ ] Automated WhatsApp reminders.
+- [ ] Appointment analytics and reporting.
 
 ---
-© 2026 Heronova - Desarrollado por Erik Palacios.
+© 2026 Heronova - Developed by Erik Palacios.
