@@ -1,0 +1,19 @@
+{
+    "HomePage": {
+        "title": "Bienvenido a Heronova",
+        "description": "Tu sistema multi-tenant está listo para el frontend.",
+        "started": "Para comenzar, edita el archivo page.tsx."
+    },
+    "LoginPage": {
+        "title": "Heronova",
+        "welcome": "Bienvenido de nuevo. Ingresa a tu cuenta.",
+        "emailLabel": "Correo Electrónico",
+        "emailPlaceholder": "tu@ejemplo.com",
+        "passwordLabel": "Contraseña",
+        "passwordPlaceholder": "••••••••",
+        "forgotPassword": "¿Olvidaste tu contraseña?",
+        "submit": "Iniciar Sesión",
+        "noAccount": "¿No tienes una cuenta?",
+        "signUp": "Crea una ahora"
+    }
+}
