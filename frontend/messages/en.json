@@ -17,5 +17,23 @@
         "errorServer": "Server error. Please try again later.",
         "noAccount": "Don't have an account?",
         "signUp": "Create one now"
+    },
+    "RegisterPage": {
+        "title": "Join Heronova",
+        "description": "Create your admin account and set up your business.",
+        "emailLabel": "Email Address",
+        "emailPlaceholder": "you@example.com",
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "••••••••",
+        "businessNameLabel": "Business Name",
+        "businessNamePlaceholder": "e.g., My VIP Salon",
+        "phoneLabel": "Business WhatsApp",
+        "phonePlaceholder": "521XXXXXXXXXX",
+        "submit": "Create Account",
+        "errorEmailExists": "This email is already registered.",
+        "errorServer": "Server error. Please try again later.",
+        "success": "Account created successfully! You can now sign in.",
+        "hasAccount": "Already have an account?",
+        "signIn": "Sign In"
     }
 }

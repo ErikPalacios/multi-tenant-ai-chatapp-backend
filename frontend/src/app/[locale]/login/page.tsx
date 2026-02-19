@@ -135,7 +135,7 @@ export default function LoginPage() {
                 <div className="mt-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
                     {t("noAccount")}{" "}
                     <Link
-                        href="/"
+                        href="/register"
                         className="font-bold text-foreground hover:underline"
                     >
                         {t("signUp")}

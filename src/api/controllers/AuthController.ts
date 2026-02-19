@@ -14,31 +14,62 @@ export class AuthController {
         }
 
         try {
+            console.log(`[Reg Debug] Starting registration for: ${email}`);
             const existingUser = await UserService.getUserByEmail(email);
             if (existingUser) {
+                // Check if they are an orphaned user from a previous failed registration
+                const memberships = await UserService.getMembershipsByUser(existingUser.id);
+                if (memberships.length === 0) {
+                    console.log(`[Reg Debug] User exists but has no memberships. Proceeding to create business for: ${email}`);
+                    const business = await BusinessService.createBusiness(businessName, whatsappConfig);
+                    console.log(`[Reg Debug] Business created: ${business.id}`);
+
+                    const membership = await UserService.createMembership(existingUser.id, business.id, 'OWNER');
+                    console.log(`[Reg Debug] Membership created`);
+
+                    const token = AuthService.generateToken({
+                        userId: existingUser.id,
+                        businessId: business.id,
+                        role: membership.role
+                    });
+                    console.log(`[Reg Debug] Token generated for orphaned user`);
+
+                    return res.status(201).json({ token });
+                }
+
+                console.log(`[Reg Error] User already exists and has a business: ${email}`);
                 return res.status(400).json({ error: 'User already exists' });
             }
 
             const passwordHash = await AuthService.hashPassword(password);
+            console.log(`[Reg Debug] Password hashed`);
+
             const user = await UserService.createUser(email, passwordHash);
+            console.log(`[Reg Debug] User created: ${user.id}`);
+
             const business = await BusinessService.createBusiness(businessName, whatsappConfig);
+            console.log(`[Reg Debug] Business created: ${business.id}`);
+
             const membership = await UserService.createMembership(user.id, business.id, 'OWNER');
+            console.log(`[Reg Debug] Membership created`);
 
             const token = AuthService.generateToken({
                 userId: user.id,
                 businessId: business.id,
                 role: membership.role
             });
+            console.log(`[Reg Debug] Token generated`);
 
             return res.status(201).json({ token });
-        } catch (error) {
-            console.error('Registration error:', error);
+        } catch (error: any) {
+            console.error('Registration error details:', error.message, error.stack);
             return res.status(500).json({ error: 'Internal server error' });
         }
     }
 
     static async login(req: CustomRequest, res: Response) {
         const { email, password } = req.body;
+        console.log(`[Login Attempt] Email: ${email}`);
 
         if (!email || !password) {
             return res.status(400).json({ error: 'Email and password required' });
@@ -47,16 +78,22 @@ export class AuthController {
         try {
             const user = await UserService.getUserByEmail(email);
             if (!user) {
+                console.log(`[Login Error] User not found for email: ${email}`);
                 return res.status(401).json({ error: 'Invalid credentials' });
             }
 
+            console.log(`[Login Debug] User found: ${user.id}`);
             const isValid = await AuthService.comparePassword(password, user.passwordHash);
+
             if (!isValid) {
+                console.log(`[Login Error] Password mismatch for user: ${email}`);
                 return res.status(401).json({ error: 'Invalid credentials' });
             }
 
             // For now, take the first membership. Real app might need a business selection.
             const memberships = await UserService.getMembershipsByUser(user.id);
+            console.log(`[Login Debug] Memberships found: ${memberships.length}`);
+
             if (memberships.length === 0) {
                 return res.status(403).json({ error: 'User has no business membership' });
             }

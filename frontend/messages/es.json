@@ -17,5 +17,23 @@
         "errorServer": "Error en el servidor. Inténtalo más tarde.",
         "noAccount": "¿No tienes una cuenta?",
         "signUp": "Crea una ahora"
+    },
+    "RegisterPage": {
+        "title": "Únete a Heronova",
+        "description": "Crea tu cuenta de administrador y configura tu negocio.",
+        "emailLabel": "Correo Electrónico",
+        "emailPlaceholder": "tu@ejemplo.com",
+        "passwordLabel": "Contraseña",
+        "passwordPlaceholder": "••••••••",
+        "businessNameLabel": "Nombre del Negocio",
+        "businessNamePlaceholder": "Ej: Mi Estética VIP",
+        "phoneLabel": "WhatsApp del Negocio",
+        "phonePlaceholder": "521XXXXXXXXXX",
+        "submit": "Crear Cuenta",
+        "errorEmailExists": "El correo ya está registrado.",
+        "errorServer": "Error en el servidor. Inténtalo más tarde.",
+        "success": "¡Cuenta creada con éxito! Ahora puedes iniciar sesión.",
+        "hasAccount": "¿Ya tienes una cuenta?",
+        "signIn": "Inicia Sesión"
     }
 }

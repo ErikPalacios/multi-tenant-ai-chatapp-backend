@@ -9,6 +9,7 @@ if (!admin.apps.length) {
 }
 
 const db = admin.firestore();
+db.settings({ ignoreUndefinedProperties: true });
 
 export class FirebaseService {
     // Utility for multi-tenant collection paths
