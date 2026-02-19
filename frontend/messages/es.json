@@ -13,6 +13,8 @@
         "passwordPlaceholder": "••••••••",
         "forgotPassword": "¿Olvidaste tu contraseña?",
         "submit": "Iniciar Sesión",
+        "errorInvalid": "Credenciales inválidas. Inténtalo de nuevo.",
+        "errorServer": "Error en el servidor. Inténtalo más tarde.",
         "noAccount": "¿No tienes una cuenta?",
         "signUp": "Crea una ahora"
     }

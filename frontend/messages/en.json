@@ -13,6 +13,8 @@
         "passwordPlaceholder": "••••••••",
         "forgotPassword": "Forgot your password?",
         "submit": "Sign In",
+        "errorInvalid": "Invalid credentials. Please try again.",
+        "errorServer": "Server error. Please try again later.",
         "noAccount": "Don't have an account?",
         "signUp": "Create one now"
     }

@@ -1,18 +1,53 @@
 "use client";
 
 import React, { useState } from "react";
-import { Link } from "@/i18n/routing";
+import { Link, useRouter } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 
 export default function LoginPage() {
     const t = useTranslations("LoginPage");
+    const router = useRouter();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log("Login attempt:", { email, password });
-        // Aquí se conectará con el backend después
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email, password }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    setError(t("errorInvalid"));
+                } else {
+                    setError(t("errorServer"));
+                }
+                return;
+            }
+
+            // Save token
+            localStorage.setItem("heronova_token", data.token);
+
+            // Redirect to home or dashboard
+            router.push("/");
+        } catch (err) {
+            console.error("Login Error:", err);
+            setError(t("errorServer"));
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -27,6 +62,12 @@ export default function LoginPage() {
                         {t("welcome")}
                     </p>
                 </div>
+
+                {error && (
+                    <div className="mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm font-medium text-center">
+                        {error}
+                    </div>
+                )}
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Email Field */}
@@ -44,7 +85,8 @@ export default function LoginPage() {
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder={t("emailPlaceholder")}
                             required
-                            className="w-full px-5 py-3 rounded-2xl bg-input border-transparent focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-foreground"
+                            disabled={isLoading}
+                            className="w-full px-5 py-3 rounded-2xl bg-input border-transparent focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-foreground disabled:opacity-50"
                         />
                     </div>
 
@@ -71,15 +113,20 @@ export default function LoginPage() {
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder={t("passwordPlaceholder")}
                             required
-                            className="w-full px-5 py-3 rounded-2xl bg-input border-transparent focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-foreground"
+                            disabled={isLoading}
+                            className="w-full px-5 py-3 rounded-2xl bg-input border-transparent focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-foreground disabled:opacity-50"
                         />
                     </div>
 
                     {/* Submit Button */}
                     <button
                         type="submit"
-                        className="w-full py-4 px-6 rounded-2xl bg-primary text-primary-foreground font-bold hover:bg-primary-hover hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-lg shadow-primary/20"
+                        disabled={isLoading}
+                        className="w-full py-4 px-6 rounded-2xl bg-primary text-primary-foreground font-bold hover:bg-primary-hover hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-lg shadow-primary/20 disabled:opacity-50 disabled:scale-100 flex items-center justify-center gap-2"
                     >
+                        {isLoading && (
+                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        )}
                         {t("submit")}
                     </button>
                 </form>
