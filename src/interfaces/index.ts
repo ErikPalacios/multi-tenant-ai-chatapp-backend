@@ -63,6 +63,10 @@ export interface Business {
         metaToken?: string;
         metaPhoneNumberId?: string;
     };
+    onboardingCompleted: boolean;
+    industry?: string;
+    monthlyVolume?: string;
+    whatsappUsage?: string;
     isActive: boolean;
     createdAt: Date;
 }

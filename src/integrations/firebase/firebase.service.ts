@@ -248,6 +248,13 @@ export class FirebaseService {
         } as Business;
     }
 
+    static async updateBusiness(businessId: string, data: Partial<Business>): Promise<void> {
+        await this.businessDoc(businessId).update({
+            ...data,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+    }
+
     static async saveMembership(membership: Membership): Promise<void> {
         const id = `${membership.userId}_${membership.businessId}`;
         await this.membershipsColl.doc(id).set(membership);

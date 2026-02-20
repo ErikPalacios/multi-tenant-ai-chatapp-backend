@@ -55,73 +55,32 @@ export class CollectNameState implements State {
             };
         }
 
-        const { serviceName, date, time } = ctx.session.memory;
-        const completeMessage = APPOINTMENT_COMPLETE_MESSAGE.replace('{{serviceName}}', serviceName).replace('{{date}}', date).replace('{{time}}', time);
+        const { serviceId, serviceName, date, time } = ctx.session.memory;
 
-        if (name.includes(BACK_TO_NAME_MESSAGE)) {
-            return {
-                newState: 'COLLECT_NAME',
-                responseMessages: [
-                    {
-                        type: 'list',
-                        content: ASK_NAME_MESSAGE,
-                        title: ASK_NAME_MESSAGE,
-                        buttonText: ASK_NAME_MESSAGE,
-                        rows: [
-                            {
-                                title: BACK_TO_TIME_MESSAGE,
-                                description: BACK_TO_TIME_MESSAGE
-                            },
-                            {
-                                title: CANCEL_PROCESS_MESSAGE,
-                                description: CANCEL_PROCESS_MESSAGE
-                            }
-                        ]
-                    }
-                ]
-            };
-        }
-
-        const appointment: Appointment = {
-            id: await AppointmentEngine.generateFolio(),
-            businessId: ctx.session.businessId,
-            customerId: ctx.session.waId,
-            serviceId: ctx.session.memory.serviceId,
-            serviceName: ctx.session.memory.serviceName,
-            date: ctx.session.memory.date,
-            time: ctx.session.memory.time,
-            name: name,
-            status: 'pending',
-            folio: '',
-            createdAt: new Date(),
-            employeeId: ctx.session.memory.employeeId,
-            // commissionAmount: ctx.session.memory.commissionAmount, // La comisión solo se debe entregar una vez que se haya pagado el servicio
-        };
-
-        const result = await AppointmentEngine.bookAppointment(ctx.session.businessId, appointment);
+        const confirmMessage = `Estás a punto de agendar: ${serviceName} el ${date} a las ${time}. ¿Confirmas la cita?`;
 
         return {
-            newState: 'COMPLETED',
+            newState: 'CONFIRMATION',
             responseMessages: [
                 {
                     type: 'list',
-                    content: completeMessage,
-                    title: completeMessage,
-                    buttonText: completeMessage,
+                    content: confirmMessage,
+                    title: 'Confirmar Cita',
+                    buttonText: 'Confirmar',
                     rows: [
                         {
-                            title: REQUEST_NAME_AGAIN_MESSAGE,
-                            description: REQUEST_NAME_AGAIN_MESSAGE
+                            title: 'Sí, agendar',
+                            description: 'Confirmar cita'
                         },
                         {
-                            title: CANCEL_PROCESS_MESSAGE,
-                            description: CANCEL_PROCESS_MESSAGE
+                            title: 'Cancelar',
+                            description: 'Cancelar proceso'
                         }
                     ]
                 }
             ],
             memoryUpdate: {
-                name: name
+                customerName: name
             }
         };
     }

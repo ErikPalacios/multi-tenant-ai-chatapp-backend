@@ -14,8 +14,8 @@ export class ConfirmationState implements State {
     async handle(ctx: ConversationContext): Promise<DomainResponse> {
         const text = ctx.message.message; // Removed toLowerCase() to match button text exactly if needed, or we can use includes
 
-        if (text.includes(CONFIRMATION_APPOINTMENT_BY_USER)) {
-            const { serviceId, date, time, customerName } = ctx.session.memory;
+        if (text.includes('sí') || text.includes('agendar') || text.includes('confirmar') || text.includes(CONFIRMATION_APPOINTMENT_BY_USER.toLowerCase())) {
+            const { serviceId, serviceName, date, time, customerName, turn } = ctx.session.memory;
 
             const services = await FirebaseService.getServices(ctx.businessId);
             const service = services.find(s => s.id === serviceId);
@@ -27,13 +27,22 @@ export class ConfirmationState implements State {
                 };
             }
 
-            const appointment = await AppointmentEngine.bookAppointment(ctx.businessId, {
-                waId: ctx.customer.waId,
-                service,
+            const appointmentObj = {
+                id: '',
+                folio: '',
+                businessId: ctx.businessId,
+                customerId: ctx.customer.waId,
+                serviceId: service.id,
+                serviceName: service.name,
                 date,
                 time,
-                customerName
-            });
+                turn,
+                name: customerName,
+                status: 'confirmed' as const,
+                createdAt: new Date(),
+            };
+
+            const appointment = await AppointmentEngine.bookAppointment(ctx.businessId, appointmentObj as any);
 
             if (!appointment) {
                 return {
@@ -44,10 +53,12 @@ export class ConfirmationState implements State {
                 };
             }
 
+            const completeMessage = COMPLETED_APPOINTMENT_MESSAGE.replace('{{serviceName}}', service.name).replace('{{date}}', date).replace('{{time}}', time).replace('{{folio}}', appointment.folio || '');
+
             return {
                 newState: 'COMPLETED',
                 responseMessages: [
-                    COMPLETED_APPOINTMENT_MESSAGE
+                    completeMessage
                 ],
                 memoryUpdate: {
                     lastFolio: appointment.folio
@@ -55,7 +66,7 @@ export class ConfirmationState implements State {
             };
         }
 
-        if (text.includes(CANCEL_APPOINTMENT_BY_USER)) {
+        if (text.includes('cancelar') || text.includes(CANCEL_APPOINTMENT_BY_USER.toLowerCase())) {
             return {
                 newState: 'IDLE',
                 responseMessages: [NO_APPOINTMENT_MESSAGE]

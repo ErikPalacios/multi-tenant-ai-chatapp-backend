@@ -9,7 +9,8 @@ vi.mock('firebase-admin', () => {
         doc: vi.fn().mockReturnThis(),
         where: vi.fn().mockReturnThis(),
         limit: vi.fn().mockReturnThis(),
-        get: vi.fn()
+        get: vi.fn(),
+        settings: vi.fn()
     };
     return {
         default: {

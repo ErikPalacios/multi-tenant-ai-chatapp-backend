@@ -3,14 +3,27 @@ import { AppointmentEngine } from '../../../domains/appointments/AppointmentEngi
 import { ConversationContext, DomainResponse } from '../../../interfaces/index.js';
 import { State } from '../State.js';
 import { TenantService } from '../../../services/TenantService.js';
+import { FirebaseService } from '../../../integrations/firebase/firebase.service.js';
 
 export class SelectDayState implements State {
     async handle(ctx: ConversationContext): Promise<DomainResponse> {
         const text = ctx.message.message.toLowerCase();
         const config = await TenantService.getBusinessConfig(ctx.businessId);
-        const turns = await AppointmentEngine.getAvailableTurns(ctx.businessId, config, ctx.session.memory.serviceId, ctx.session.memory.date);
-        const selectedService = ctx.session.memory.serviceId;
+
+        const selectedServiceId = ctx.session.memory.serviceId;
+        const selectedDate = text; // The incoming text IS the date they selected in the previous step
+
+        const selectedService = (await FirebaseService.getServices(ctx.businessId)).find(s => s.id === selectedServiceId);
+
+        if (!selectedService) {
+            return {
+                newState: 'SELECT_SERVICE',
+                responseMessages: ['Servicio no encontrado. Por favor, elige un servicio válido.']
+            };
+        }
+
         const availableDays = await AppointmentEngine.getAvailableDays(ctx.businessId, config, selectedService);
+        const turns = (await AppointmentEngine.getAvailableTurns(ctx.businessId, config, selectedService, selectedDate)) || [];
 
         if (!turns.length) {
             return {

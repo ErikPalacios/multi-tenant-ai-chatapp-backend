@@ -7,12 +7,25 @@ import { AppointmentEngine } from '../../../domains/appointments/AppointmentEngi
 import { ConversationContext, DomainResponse } from '../../../interfaces/index.js';
 import { State } from '../State.js';
 import { TenantService } from '../../../services/TenantService.js';
+import { FirebaseService } from '../../../integrations/firebase/firebase.service.js';
 
 export class SelectTurnState implements State {
     async handle(ctx: ConversationContext): Promise<DomainResponse> {
         const text = ctx.message.message.toLowerCase();
         const config = await TenantService.getBusinessConfig(ctx.businessId);
-        const turns = await AppointmentEngine.getAvailableTurns(ctx.businessId, config, ctx.session.memory.serviceId, ctx.session.memory.date);
+
+        const selectedServiceId = ctx.session.memory.serviceId;
+        const selectedDate = ctx.session.memory.date;
+
+        const selectedService = (await FirebaseService.getServices(ctx.businessId)).find(s => s.id === selectedServiceId);
+        if (!selectedService) {
+            return {
+                newState: 'SELECT_SERVICE',
+                responseMessages: ['Servicio no encontrado. Por favor, elige un servicio válido.']
+            };
+        }
+
+        const turns = (await AppointmentEngine.getAvailableTurns(ctx.businessId, config, selectedService, selectedDate)) || [];
 
         if (!turns.includes(text)) {
             return {
@@ -33,7 +46,7 @@ export class SelectTurnState implements State {
         };
 
         if (text.includes(BACK_TO_DAY_MESSAGE)) {
-            const availableDays = await AppointmentEngine.getAvailableDays(ctx.businessId, config, ctx.session.memory.serviceId);
+            const availableDays = await AppointmentEngine.getAvailableDays(ctx.businessId, config, selectedService);
             return {
                 newState: 'SELECT_DAY',
                 responseMessages: [
@@ -51,9 +64,12 @@ export class SelectTurnState implements State {
             };
         };
 
-        const getAvailableSlots = await AppointmentEngine.getAvailableSlotsByTurn(ctx.businessId, config, ctx.session.memory.serviceId, "", text, ctx.session.memory.maxTurnsPerDay.length);
+        const targetDateObj = new Date(selectedDate + 'T00:00:00');
+        const maxTurns = config.maxTurnsPerDay ? config.maxTurnsPerDay[targetDateObj.getDay()] || 1 : 1;
 
-        if (!getAvailableSlots.length) {
+        const getAvailableSlots = await AppointmentEngine.getAvailableSlotsByTurn(ctx.businessId, config, selectedService, selectedDate, text, maxTurns);
+
+        if (!getAvailableSlots || !getAvailableSlots.length) {
             return {
                 newState: 'SELECT_TURN',
                 responseMessages: [

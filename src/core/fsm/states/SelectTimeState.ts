@@ -25,28 +25,6 @@ export class SelectTimeState implements State {
         const services = await FirebaseService.getServices(ctx.businessId);
         const service = services.find(s => s.id === serviceId);
 
-        const availableSlots = await AppointmentEngine.getAvailableSlotsByTurn(ctx.businessId, config, serviceId, date, turn, ctx.session.memory.maxTurnsPerDay.length);
-
-        if (!availableSlots.includes(text)) {
-            return {
-                newState: 'SELECT_TIME',
-                responseMessages: [
-                    {
-                        type: 'list',
-                        content: ASK_TIME_AGAIN_MESSAGE,
-                        title: TITLE_DAYS_MESSAGE,
-                        buttonText: BUTTON_DAYS_MESSAGE,
-                        rows: availableSlots.slice(0, 10).map(slot => ({
-                            title: slot,
-                            description: DESCRIPTION_DAYS_MESSAGE
-                        }))
-                    }
-                ]
-            };
-        }
-
-        // Manage no service  
-
         if (!service) {
             return {
                 newState: 'SELECT_SERVICE',
@@ -65,8 +43,12 @@ export class SelectTimeState implements State {
             };
         }
 
+        const targetDateObj = new Date(date + 'T00:00:00');
+        const maxTurns = config.maxTurnsPerDay ? config.maxTurnsPerDay[targetDateObj.getDay()] || 1 : 1;
+
+        const availableSlots = (await AppointmentEngine.getAvailableSlotsByTurn(ctx.businessId, config, service, date, turn, maxTurns)) || [];
+
         if (text.includes(BACK_TO_TIME_MESSAGE)) {
-            const availableSlots = await AppointmentEngine.getAvailableSlotsByTurn(ctx.businessId, config, serviceId, date, turn, ctx.session.memory.maxTurnsPerDay.length);
             return {
                 newState: 'SELECT_TIME',
                 responseMessages: [
@@ -82,7 +64,25 @@ export class SelectTimeState implements State {
                     }
                 ],
             };
-        };
+        }
+
+        if (!availableSlots.includes(text)) {
+            return {
+                newState: 'SELECT_TIME',
+                responseMessages: [
+                    {
+                        type: 'list',
+                        content: ASK_TIME_AGAIN_MESSAGE,
+                        title: TITLE_DAYS_MESSAGE,
+                        buttonText: BUTTON_DAYS_MESSAGE,
+                        rows: availableSlots.slice(0, 10).map(slot => ({
+                            title: slot,
+                            description: DESCRIPTION_DAYS_MESSAGE
+                        }))
+                    }
+                ]
+            };
+        }
 
         return {
             newState: 'COLLECT_NAME',
@@ -105,6 +105,7 @@ export class SelectTimeState implements State {
                 }
             ],
             memoryUpdate: {
+                time: text,
                 customerName: undefined
             }
         };

@@ -35,5 +35,30 @@
         "success": "¡Cuenta creada con éxito! Ahora puedes iniciar sesión.",
         "hasAccount": "¿Ya tienes una cuenta?",
         "signIn": "Inicia Sesión"
+    },
+    "OnboardingForm": {
+        "title": "¡Bienvenido a Heronova!",
+        "description": "Para preparar tu cuenta y la integración de WhatsApp, por favor responde unas breves preguntas.",
+        "submit": "Completar y Continuar",
+        "loading": "Guardando...",
+        "errorServer": "Error al guardar los datos de onboarding.",
+        "unknownError": "Error desconocido.",
+        "selectPlaceholder": "Selecciona una opción",
+        "requiredField": "El campo \"{field}\" es obligatorio.",
+        "industryLabel": "Tipo de Industria",
+        "industryPlaceholder": "Selecciona tu tipo de negocio",
+        "industryBeauty": "Salón de Belleza / Peluquería",
+        "industryHealth": "Clínica Médica / Dental",
+        "industryConsulting": "Servicios Profesionales",
+        "industryFood": "Restaurante / Comida",
+        "industryOther": "Otro",
+        "monthlyVolumeLabel": "Volumen Mensual de Mensajes Estimado",
+        "volumeLow": "Menos de 1k mensajes",
+        "volumeMedium": "Entre 1k y 5k mensajes",
+        "volumeHigh": "Más de 5k mensajes",
+        "whatsappUsageLabel": "Uso actual de WhatsApp en tu negocio",
+        "usageNone": "No lo usamos",
+        "usageManual": "Solo atención manual",
+        "usageAutomated": "Ya usamos bots"
     }
 }

@@ -12,7 +12,8 @@ vi.mock('firebase-admin', () => {
         get: vi.fn(),
         set: vi.fn().mockResolvedValue({}),
         delete: vi.fn().mockResolvedValue({}),
-        runTransaction: vi.fn()
+        runTransaction: vi.fn(),
+        settings: vi.fn()
     };
     return {
         default: {

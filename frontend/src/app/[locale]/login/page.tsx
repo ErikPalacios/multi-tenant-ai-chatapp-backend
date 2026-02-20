@@ -40,8 +40,8 @@ export default function LoginPage() {
             // Save token
             localStorage.setItem("heronova_token", data.token);
 
-            // Redirect to home or dashboard
-            router.push("/");
+            // Redirect to dashboard
+            router.push("/dashboard");
         } catch (err) {
             console.error("Login Error:", err);
             setError(t("errorServer"));

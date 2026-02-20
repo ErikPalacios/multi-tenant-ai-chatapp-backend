@@ -47,8 +47,9 @@ export default function RegisterPage() {
                 }),
             });
 
+            const data = await response.json();
+
             if (!response.ok) {
-                const data = await response.json();
                 if (response.status === 400 && data.error === 'User already exists') {
                     setError(t("errorEmailExists"));
                 } else {
@@ -57,10 +58,15 @@ export default function RegisterPage() {
                 return;
             }
 
+            // Guardar token y redirigir al dashboard para onboarding
+            if (data.token) {
+                localStorage.setItem("heronova_token", data.token);
+            }
+
             setSuccess(true);
             setTimeout(() => {
-                router.push("/login");
-            }, 3000);
+                router.push("/dashboard");
+            }, 2000);
         } catch (err) {
             console.error("Registration Error:", err);
             setError(t("errorServer"));

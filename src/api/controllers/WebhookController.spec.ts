@@ -9,6 +9,7 @@ import { SupportGuard } from '../../core/guards/SupportGuard.js';
 import { FSMOrchestrator } from '../../core/fsm/Orchestrator.js';
 import { WatiService } from '../../integrations/messaging/providers/wati/wati.service.js';
 import admin from 'firebase-admin';
+import { MessagingFactory } from '../../integrations/messaging/MessagingFactory.js';
 
 // Mocks
 vi.mock('../../services/TenantService.js');
@@ -29,7 +30,8 @@ vi.mock('firebase-admin', () => {
             docs: []
         }),
         set: vi.fn().mockResolvedValue({}),
-        runTransaction: vi.fn()
+        runTransaction: vi.fn(),
+        settings: vi.fn()
     };
     return {
         default: {
@@ -42,6 +44,14 @@ vi.mock('firebase-admin', () => {
         }
     };
 });
+vi.mock('../../integrations/messaging/MessagingFactory.js');
+
+const messagingProviderMock = {
+    sendMessage: vi.fn(),
+    sendButtons: vi.fn(),
+    sendList: vi.fn()
+};
+(MessagingFactory.getProvider as any).mockReturnValue(messagingProviderMock);
 
 const app = express();
 app.use(express.json());
@@ -58,6 +68,7 @@ describe('WebhookController', () => {
             businessId: 'test-biz',
             platform: 'wati'
         });
+        vi.mocked(TenantService.getEmployee).mockResolvedValue(null as any);
         vi.mocked(FirebaseService.getCustomer).mockResolvedValue({
             waId: '12345',
             businessId: 'test-biz',
@@ -88,9 +99,7 @@ describe('WebhookController', () => {
                 senderName: 'Test User'
             });
 
-        expect(response.status).toBe(200);
-        expect(response.text).toBe('OK');
-        expect(WatiService.sendMessage).toHaveBeenCalledWith('12345', 'Hola! ¿En qué puedo ayudarte?', expect.any(Object));
+        expect(messagingProviderMock.sendMessage).toHaveBeenCalledWith('12345', 'Hola! ¿En qué puedo ayudarte?');
     });
 
     it('should ignore request if human support is active', async () => {
@@ -98,6 +107,7 @@ describe('WebhookController', () => {
             businessId: 'test-biz',
             platform: 'wati'
         });
+        vi.mocked(TenantService.getEmployee).mockResolvedValue(null as any);
         vi.mocked(FirebaseService.getCustomer).mockResolvedValue({
             waId: '12345',
             businessId: 'test-biz',

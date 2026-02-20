@@ -3,12 +3,14 @@ import { FSMOrchestrator } from './Orchestrator.js';
 import { FirebaseService } from '../../integrations/firebase/firebase.service.js';
 import { TenantService } from '../../services/TenantService.js';
 import { AppointmentEngine } from '../../domains/appointments/AppointmentEngine.js';
+import { AIService } from '../../integrations/ai/ai.service.js';
 import { ConversationContext, Customer, ConversationStatus } from '../../interfaces/index.js';
 
 // Mocks
 vi.mock('../../integrations/firebase/firebase.service.js');
 vi.mock('../../services/TenantService.js');
 vi.mock('../../domains/appointments/AppointmentEngine.js');
+vi.mock('../../integrations/ai/ai.service.js');
 
 describe('Appointment Flow Integration (n8n Style)', () => {
     const businessId = 'test-biz';
@@ -53,14 +55,22 @@ describe('Appointment Flow Integration (n8n Style)', () => {
             workingHours: { start: '09:00', end: '18:00' }
         });
 
+        vi.mocked(AIService.classifyIntent).mockResolvedValue('Citas' as any);
+
         // Simulamos días disponibles
         vi.mocked(AppointmentEngine.getAvailableDays).mockResolvedValue([
             '2024-05-25', '2024-05-26'
+        ]);
+        vi.mocked(AppointmentEngine.getAvailableTurns).mockResolvedValue([
+            'morning', 'afternoon'
         ]);
 
         // Simulamos horarios disponibles
         vi.mocked(AppointmentEngine.getAvailableSlots).mockResolvedValue([
             '09:00', '10:00', '16:00'
+        ]);
+        vi.mocked(AppointmentEngine.getAvailableSlotsByTurn).mockResolvedValue([
+            '09:00', '10:00'
         ]);
 
         // Simulamos creación de cita exitosa

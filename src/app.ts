@@ -2,10 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import { WebhookController } from './api/controllers/WebhookController.js';
 import { AuthController } from './api/controllers/AuthController.js';
+import { BusinessController } from './api/controllers/BusinessController.js';
 import { authMiddleware, requireRole } from './api/middlewares/auth.middleware.js';
 
 const app = express();
-
 
 app.use(cors());
 app.use(express.json());
@@ -19,6 +19,7 @@ app.post('/auth/login', AuthController.login);
 app.get('/me', authMiddleware, AuthController.getMe);
 app.get('/employees', authMiddleware, requireRole(['OWNER']), AuthController.getEmployees);
 app.post('/employees', authMiddleware, requireRole(['OWNER']), AuthController.createEmployee);
+app.post('/business/onboarding', authMiddleware, requireRole(['OWNER']), BusinessController.completeOnboarding);
 
 // Health check
 app.get('/health', (req, res) => {

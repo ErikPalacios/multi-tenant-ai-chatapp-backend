@@ -81,8 +81,8 @@ export class AppointmentEngine {
                 const hasMorning = slots.some(s => s < CUTOFF_TIME);
                 const hasAfternoon = slots.some(s => s >= CUTOFF_TIME);
 
-                if (hasMorning) turns2.push('Matutino');
-                if (hasAfternoon) turns2.push('Vespertino');
+                if (hasMorning) turns2.push('morning');
+                if (hasAfternoon) turns2.push('afternoon');
 
                 return turns2;
             case 3:
@@ -93,9 +93,9 @@ export class AppointmentEngine {
                 const hasAfternoon3 = slots3.some(s => s >= CUTOFF_TIME && s < CUTOFF_TIME_NOCTURN);
                 const hasNocturn3 = slots3.some(s => s >= CUTOFF_TIME_NOCTURN);
 
-                if (hasMorning3) turns3.push('Matutino');
-                if (hasAfternoon3) turns3.push('Vespertino');
-                if (hasNocturn3) turns3.push('Nocturno');
+                if (hasMorning3) turns3.push('morning');
+                if (hasAfternoon3) turns3.push('afternoon');
+                if (hasNocturn3) turns3.push('night');
 
                 return turns3;
             default:
@@ -188,14 +188,14 @@ export class AppointmentEngine {
     /**
      * Attempts to lock a slot and create an appointment.
      */
-    static async bookAppointment(businessId: string, data: Appointment): Promise<Appointment | null> {
+    static async bookAppointment(businessId: string, data: Appointment & { employee?: Employee }): Promise<Appointment | null> {
         const lockId = `${businessId}:${data.serviceId}:${data.date}:${data.time}`;
 
         const locked = await FirebaseService.acquireLock(lockId);
         if (!locked) return null;
 
         try {
-            const appointment = {
+            const appointment: Appointment = {
                 id: uuidv4(),
                 businessId,
                 customerId: data.customerId,
@@ -203,11 +203,12 @@ export class AppointmentEngine {
                 serviceName: data.serviceName,
                 date: data.date,
                 time: data.time,
+                name: data.name || 'Unknown',
                 status: 'confirmed',
-                folio: `APP-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+                folio: await this.generateFolio(),
                 createdAt: new Date(),
-                employeeId: "1234",
-                commissionAmount: 0
+                employeeId: data.employee?.id || "1234",
+                commissionAmount: this.calculateCommission({ price: 100 } as any, data.employee) || 0
             };
 
             await FirebaseService.saveAppointment(businessId, appointment);

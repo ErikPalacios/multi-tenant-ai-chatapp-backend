@@ -44,6 +44,14 @@ export class TenantService {
         };
     }
 
+    static async getEmployee(businessId: string, req: Request): Promise<string> {
+        // Implement logic to extract employee info from the webhook metadata if supported by Wati/Meta
+        // This could be via custom params appended to the webhook URL if a vendor supports it,
+        // but typically a webhook applies to the whole business number.
+        // For now, we return a fallback 'system' or 'default-employee' 
+        return req.body.employeeId || 'default-employee';
+    }
+
     static async getBusinessConfig(businessId: string): Promise<any> {
         const doc = await admin.firestore()
             .doc(`businesses/${businessId}/configs/default`)

@@ -8,6 +8,7 @@ export class BusinessService {
             id: uuidv4(),
             name,
             whatsappConfig,
+            onboardingCompleted: false,
             isActive: true,
             createdAt: new Date()
         };
@@ -17,5 +18,12 @@ export class BusinessService {
 
     static async getBusiness(businessId: string): Promise<Business | null> {
         return FirebaseService.getBusiness(businessId);
+    }
+
+    static async updateOnboarding(businessId: string, data: Partial<Business>): Promise<void> {
+        await FirebaseService.updateBusiness(businessId, {
+            ...data,
+            onboardingCompleted: true
+        });
     }
 }

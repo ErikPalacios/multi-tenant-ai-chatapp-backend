@@ -163,7 +163,7 @@ describe('AppointmentEngine', () => {
     });
 
     describe('bookAppointment', () => {
-        const data = {
+        const data: any = {
             waId: 'user-123',
             service: { id: 'srv-1', name: 'Manicura', durationMinutes: 30, price: 100 } as Service,
             date: '2024-05-25',
@@ -189,7 +189,7 @@ describe('AppointmentEngine', () => {
 
             expect(result).not.toBeNull();
             expect(result?.businessId).toBe(businessId);
-            expect(result?.folio).toMatch(/^APP-[A-Z0-9]{6}$/);
+            expect(result?.folio).toMatch(/^[A-Z0-9]{5}$/);
             expect(FirebaseService.saveAppointment).toHaveBeenCalledWith(businessId, expect.anything());
             expect(FirebaseService.releaseLock).toHaveBeenCalled();
         });

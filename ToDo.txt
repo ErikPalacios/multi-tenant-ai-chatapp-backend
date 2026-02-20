@@ -1,1 +1,1 @@
-1. Fix the employeeId in bookAppointment
+[X] 1. Usar el lenguage manager para el onboarding
