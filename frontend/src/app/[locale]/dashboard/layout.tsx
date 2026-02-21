@@ -76,7 +76,10 @@ export default function DashboardLayout({
         return (
             <div className="min-h-screen bg-linear-to-br from-background via-card to-background p-4 flex items-center justify-center">
                 <div className="w-full max-w-2xl">
-                    <OnboardingForm />
+                    <OnboardingForm onComplete={() => {
+                        setNeedsOnboarding(false);
+                        router.push('/dashboard/welcome');
+                    }} />
                 </div>
             </div>
         );

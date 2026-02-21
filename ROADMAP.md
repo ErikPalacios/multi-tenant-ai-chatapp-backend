@@ -2,7 +2,7 @@
 
 This roadmap outlines the path to transforming Heronova from a functional backend into a production-ready, revenue-generating SaaS product based on a "White-Glove" (Llave en mano) onboarding model.
 
-## Phase 1: The First Impression & Onboarding
+<!-- ## Phase 1: The First Impression & Onboarding
 *Target: Create a seamless and professional experience for new business owners immediately after they register.*
 
 - [ ] **Onboarding Questionnaire UI**:
@@ -13,7 +13,7 @@ This roadmap outlines the path to transforming Heronova from a functional backen
     3. Current WhatsApp usage (None, WhatsApp Business, API).
   - Save this data to the `Business` document in Firestore to help you decide the best technical architecture (Meta Cloud API vs WATI vs Other) for each client.
 - [ ] **Pending Setup State**:
-  - Since WhatsApp setup is manual initially, show a "Pending Setup" status card on the dashboard instructing the user to schedule a configuration call or wait for your team.
+  - Since WhatsApp setup is manual initially, show a "Pending Setup" status card on the dashboard instructing the user to schedule a configuration call or wait for your team. -->
 
 ## Phase 2: The Owner's Dashboard (Core Value)
 *Target: Give the business owner a visual interface where they feel in control of the AI and their data.*

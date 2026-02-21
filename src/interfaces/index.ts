@@ -71,6 +71,30 @@ export interface Business {
     createdAt: Date;
 }
 
+export interface MessageTemplate {
+    id: string; // "template_1"
+    businessId?: string; // If undefined, it's a global "pre-made" template.
+    name: string; // e.g. "Clínica de Salud"
+    description: string;
+    sections: TemplateSection[];
+    isActive?: boolean; // Indicates if this is the currently active template for the business
+}
+
+export interface TemplateSection {
+    id: string; // e.g. "saludo"
+    title: string; // "Saludo Initial"
+    order: number;
+    messages: TemplateMessage[];
+}
+
+export interface TemplateMessage {
+    id: string; // e.g. "saludo_bienvenida"
+    description: string; // "El bot responde al primer saludo"
+    exampleUserMessage: string; // "Hola, buenas tardes!"
+    defaultBotMessage: string; // "¡Hola! Bienvenido a {{businessName}}, ¿en qué te puedo ayudar?"
+}
+
+
 export interface User {
     id: string;
     email: string;

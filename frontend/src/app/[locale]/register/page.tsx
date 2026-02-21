@@ -1,6 +1,14 @@
+/**
+ * ARCHIVO: register/page.tsx (Página de Registro de Nueva Empresa)
+ *
+ * Al igual que el Login, necesitamos `use client` porque este componente maneja 
+ * estados interactivos (como lo que escribe el usuario) y hace peticiones de red 
+ * al momento de hacer scroll o clic.
+ */
 "use client";
 
 import React, { useState } from "react";
+// Usamos nuestro Link y useRouter adaptados para múltiples idiomas (ej. /es/login)
 import { Link, useRouter } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 
@@ -8,6 +16,8 @@ export default function RegisterPage() {
     const t = useTranslations("RegisterPage");
     const router = useRouter();
 
+    // En lugar de hacer un `useState` para cada campito (email, password, nombre...), 
+    // podemos agruparlos todos en un solo objeto para tener el código más limpio.
     const [formData, setFormData] = useState({
         email: "",
         password: "",
@@ -16,21 +26,24 @@ export default function RegisterPage() {
 
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState(false);
+    const [success, setSuccess] = useState(false); // Para mostrar una franja verde de éxito
 
+    // Esta es una función "genérica" para manejar cualquier cambio en los inputs.
+    // Utiliza el `id` del input (ej: id="email") para saber qué propiedad modificar en el objeto `formData`.
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({
-            ...formData,
-            [e.target.id]: e.target.value
+            ...formData, // Copiamos el objeto anterior para no borrar lo que ya estaba escrito
+            [e.target.id]: e.target.value // Sobrescribimos solo la propiedad específica
         });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+        e.preventDefault(); // Detenemos la recarga nativa del navegador web
         setIsLoading(true);
         setError(null);
 
         try {
+            // Mandamos los datos al endpoint de "Registro de Dueños" en Node.js
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register-owner`, {
                 method: "POST",
                 headers: {
@@ -40,16 +53,19 @@ export default function RegisterPage() {
                     email: formData.email,
                     password: formData.password,
                     businessName: formData.businessName,
+                    // De paso enviamos información básica de su configuración de WhatsApp que llenarán después
                     whatsappConfig: {
                         phone: "PENDING_SETUP",
-                        platform: "meta" // Default to meta
+                        platform: "meta" // Por defecto usarán Meta (WhastApp Oficial)
                     }
                 }),
             });
 
             const data = await response.json();
 
+            // Detectamos si Node.js nos devolvió un error (ej. Usuario repetido)
             if (!response.ok) {
+                // Si el servidor nos dice explícitamente que ya existe
                 if (response.status === 400 && data.error === 'User already exists') {
                     setError(t("errorEmailExists"));
                 } else {
@@ -58,15 +74,21 @@ export default function RegisterPage() {
                 return;
             }
 
-            // Guardar token y redirigir al dashboard para onboarding
+            // Si el registro funcionó, tu Backend ya nos devolvió un Token de acceso directo. 
+            // Lo guardamos para que no tengan que hacer Login otra vez.
             if (data.token) {
                 localStorage.setItem("heronova_token", data.token);
             }
 
+            // Mostramos feedback verde bonito 🔥
             setSuccess(true);
+
+            // Pausamos Next.js por 2 segundos (2000 ms) para que el usuario alcance a leer 
+            // el mensaje verde de éxito antes de mandarlos ráfaga al Dashboard
             setTimeout(() => {
                 router.push("/dashboard");
             }, 2000);
+
         } catch (err) {
             console.error("Registration Error:", err);
             setError(t("errorServer"));
@@ -87,12 +109,14 @@ export default function RegisterPage() {
                     </p>
                 </div>
 
+                {/* Mensaje Rojo de Error */}
                 {error && (
                     <div className="mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm font-medium text-center">
                         {error}
                     </div>
                 )}
 
+                {/* Mensaje Verde de Éxito (solo aparece si success es true) */}
                 {success && (
                     <div className="mb-6 p-4 rounded-2xl bg-green-500/10 border border-green-500/20 text-green-500 text-sm font-medium text-center">
                         {t("success")}
@@ -100,26 +124,27 @@ export default function RegisterPage() {
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    {/* Business Name Field */}
+                    {/* Campo de Nombre del Negocio */}
                     <div>
                         <label htmlFor="businessName" className="block text-sm font-medium text-foreground/80 ml-1 mb-2">
                             {t("businessNameLabel")}
                         </label>
                         <input
                             type="text"
+                            // IMPORTANTE: el id DEBE coincidir con el nombre de la propiedad en el objeto formData
                             id="businessName"
                             value={formData.businessName}
-                            onChange={handleChange}
+                            onChange={handleChange} // Usamos nuestra función unificada para todos los inputs
                             placeholder={t("businessNamePlaceholder")}
                             required
-                            disabled={isLoading || success}
+                            disabled={isLoading || success} // Si está cargando o ya tuvo éxito, lo desactivamos todo
                             className="w-full px-5 py-3 rounded-2xl bg-input border-transparent focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-foreground disabled:opacity-50"
                         />
                     </div>
 
                     <div className="h-px bg-border my-2 opacity-50" />
 
-                    {/* Email Field */}
+                    {/* Campo de Email */}
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium text-foreground/80 ml-1 mb-2">
                             {t("emailLabel")}
@@ -136,7 +161,7 @@ export default function RegisterPage() {
                         />
                     </div>
 
-                    {/* Password Field */}
+                    {/* Campo de Contraseña */}
                     <div>
                         <label htmlFor="password" className="block text-sm font-medium text-foreground/80 ml-1 mb-2">
                             {t("passwordLabel")}
@@ -153,7 +178,7 @@ export default function RegisterPage() {
                         />
                     </div>
 
-                    {/* Submit Button */}
+                    {/* Botón de Enviar */}
                     <button
                         type="submit"
                         disabled={isLoading || success}

@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { onboardingQuestions, OnboardingQuestion } from '../config/onboardingQuestions';
 
-export function OnboardingForm() {
+export function OnboardingForm({ onComplete }: { onComplete: () => void }) {
     const t = useTranslations('OnboardingForm');
     const [formData, setFormData] = useState<Record<string, string>>({});
     const [loading, setLoading] = useState(false);
@@ -44,8 +44,8 @@ export function OnboardingForm() {
                 throw new Error(t('errorServer'));
             }
 
-            // Success, reload page to dismiss the wall
-            window.location.reload();
+            // Success, notify layout to clear wall and route
+            onComplete();
         } catch (err) {
             setError(err instanceof Error ? err.message : t('unknownError'));
         } finally {

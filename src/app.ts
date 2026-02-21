@@ -3,6 +3,7 @@ import cors from 'cors';
 import { WebhookController } from './api/controllers/WebhookController.js';
 import { AuthController } from './api/controllers/AuthController.js';
 import { BusinessController } from './api/controllers/BusinessController.js';
+import { FlowController } from './api/controllers/FlowController.js';
 import { authMiddleware, requireRole } from './api/middlewares/auth.middleware.js';
 
 const app = express();
@@ -20,6 +21,11 @@ app.get('/me', authMiddleware, AuthController.getMe);
 app.get('/employees', authMiddleware, requireRole(['OWNER']), AuthController.getEmployees);
 app.post('/employees', authMiddleware, requireRole(['OWNER']), AuthController.createEmployee);
 app.post('/business/onboarding', authMiddleware, requireRole(['OWNER']), BusinessController.completeOnboarding);
+
+// Message Flow Routes
+app.get('/templates/global', authMiddleware, FlowController.getGlobalTemplates);
+app.get('/templates/business', authMiddleware, requireRole(['OWNER']), FlowController.getBusinessTemplates);
+app.post('/templates/business', authMiddleware, requireRole(['OWNER']), FlowController.saveBusinessTemplate);
 
 // Health check
 app.get('/health', (req, res) => {

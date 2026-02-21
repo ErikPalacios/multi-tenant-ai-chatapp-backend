@@ -8,7 +8,7 @@ if (!admin.apps.length) {
     });
 }
 
-const db = admin.firestore();
+export const db = admin.firestore();
 db.settings({ ignoreUndefinedProperties: true });
 
 export class FirebaseService {
